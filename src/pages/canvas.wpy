@@ -1,183 +1,75 @@
 <style lang="less">
-  .userinfo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .userinfo-avatar {
-    width: 80rpx;
-    height: 80rpx;
-    border-radius: 50%;
-  }
-
-  .userinfo-nickname {
-    color: #aaa;
-  }
+.canvas-circle{
+  width: 750rpx;
+  height: 898rpx;/*81%*/
+  background-color:#eeeeee;
+}
 </style>
 <template>
   <view class="container">
-    <view class="userinfo" @tap="handleViewTap">
-      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
-      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
-    </view>
-    <toast />
+    <canvas class="canvas-circle" canvas-id="circle" disable-scroll=true @error="canvasError" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd"></canvas>
+  </view>
+  <view hidden="{{touchEnd}}">
+    Coordinates: ({{touchX}}, {{touchY}})
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
-  import List from '../components/list'
-  import Panel from '../components/panel'
-  import Counter from '../components/counter'
-  import Group from '../components/group'
-  import Toast from 'wepy-com-toast'
-  import testMixin from '../mixins/test'
 
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: 'canvas'
-    }
-    components = {
-      panel: Panel,
-      counter1: Counter,
-      counter2: Counter,
-      list: List,
-      group: Group,
-      toast: Toast
+      navigationBarTitleText: 'canvas',
+      navigationBarBackgroundColor: '#F7F7F7',
+      backgroundColor: '#F7F7F7',
+      navigationBarTextStyle: 'black'
     }
 
-    mixins = [testMixin]
+    components = {
+    }
 
     data = {
-      mynum: 20,
-      userInfo: {
-        nickName: '加载中...'
-      },
-      normalTitle: '原始标题',
-      setTimeoutTitle: '标题三秒后会被修改',
-      count: 0,
-      netrst: '',
-      groupList: [
-        {
-          id: 1,
-          name: '点击改变',
-          list: [
-            {
-              childid: '1.1',
-              childname: '子项，点我改变'
-            }, {
-              childid: '1.2',
-              childname: '子项，点我改变'
-            }, {
-              childid: '1.3',
-              childname: '子项，点我改变'
-            }
-          ]
-        },
-        {
-          id: 2,
-          name: '点击改变',
-          list: [
-            {
-              childid: '2.1',
-              childname: '子项，点我改变'
-            }, {
-              childid: '2.2',
-              childname: '子项，点我改变'
-            }, {
-              childid: '2.3',
-              childname: '子项，点我改变'
-            }
-          ]
-        },
-        {
-          id: 3,
-          name: '点击改变',
-          list: [
-            {
-              childid: '3.1',
-              childname: '子项，点我改变'
-            }
-          ]
-        }
-      ]
-    }
-
-    computed = {
-      now () {
-        return +new Date()
-      }
+      activePage : 0 ,
+      touchEnd: true ,
+      touchX: 0 ,
+      touchY: 0 ,
+      touchStartX: 0 ,
+      touchStartY: 0 
     }
 
     methods = {
-      plus () {
-        this.mynum++
+      canvasError(e){
+        console.log(e);
       },
-      toast () {
-        let promise = this.$invoke('toast', 'show', {
-          title: '自定义标题',
-          img: 'https://raw.githubusercontent.com/kiinlam/wetoast/master/images/star.png'
-        })
-
-        promise.then((d) => {
-          console.log('toast done')
-        })
+      touchStart(e){
+        this.touchEnd = false
+        this.touchX = e.touches[0].x
+        this.touchY = e.touches[0].y
+        this.touchStartX = e.touches[0].x
+        this.touchStartY = e.touches[0].y
       },
-      tap () {
-        console.log('do noting from ' + this.$name)
+      touchMove(e){
+        this.touchX = e.touches[0].x
+        this.touchY = e.touches[0].y
       },
-      communicate () {
-        console.log(this.$name + ' tap')
-
-        this.$invoke('counter2', 'minus', 45, 6)
-        this.$invoke('counter1', 'plus', 45, 6)
-
-        this.$broadcast('index-broadcast', 1, 3, 4)
-      },
-      request () {
-        let self = this
-        let i = 10
-        let map = ['MA==', 'MQo=', 'Mg==', 'Mw==', 'NA==', 'NQ==', 'Ng==', 'Nw==', 'OA==', 'OQ==']
-        while (i--) {
-          wepy.request({
-            url: 'https://www.madcoder.cn/tests/sleep.php?time=1&t=css&c=' + map[i] + '&i=' + i,
-            success: function (d) {
-              self.netrst += d.data + '.'
-              self.$apply()
-            }
-          })
-        }
-      },
-      counterEmit (...args) {
-        let $event = args[args.length - 1]
-        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      touchEnd(e){
+        this.touchEnd = true
       }
     }
 
     events = {
-      'index-emit': (...args) => {
+      'change-view': (...args) => {
         let $event = args[args.length - 1]
         console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
       }
     }
 
     onLoad() {
-      let self = this
-      this.$parent.getUserInfo(function (userInfo) {
-        if (userInfo) {
-          self.userInfo = userInfo
-        }
-        self.normalTitle = '标题已被修改'
+    }
 
-        self.setTimeoutTitle = '标题三秒后会被修改'
-        setTimeout(() => {
-          self.setTimeoutTitle = '到三秒了'
-          self.$apply()
-        }, 3000)
+    onReady() {
+      let context = wx.createCanvasContext('circle')
 
-        self.$apply()
-      })
     }
   }
 </script>

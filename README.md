@@ -17,4 +17,9 @@ wepy build --watch
 ```
 
 
+## 插件（src/libs）
+
+图表 [wx-charts](https://github.com/xiaolin3303/wx-charts) 28kb
+
+
 
