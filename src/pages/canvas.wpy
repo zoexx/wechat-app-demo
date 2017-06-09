@@ -7,7 +7,7 @@
 </style>
 <template>
   <view class="container">
-    <canvas class="canvas-circle" canvas-id="circle" disable-scroll=true @error="canvasError" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd"></canvas>
+    <canvas class="canvas-circle" canvas-id="circle" disable-scroll="true" @error="canvasError" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd"></canvas>
   </view>
   <view hidden="{{touchEnd}}">
     Coordinates: ({{touchX}}, {{touchY}})
@@ -29,30 +29,30 @@
     }
 
     data = {
-      activePage : 0 ,
-      touchEnd: true ,
-      touchX: 0 ,
-      touchY: 0 ,
-      touchStartX: 0 ,
-      touchStartY: 0 
+      activePage: 0,
+      touchEnd: true,
+      touchX: 0,
+      touchY: 0,
+      touchStartX: 0,
+      touchStartY: 0
     }
 
     methods = {
-      canvasError(e){
-        console.log(e);
+      canvasError(e) {
+        console.log(e)
       },
-      touchStart(e){
+      touchStart(e) {
         this.touchEnd = false
         this.touchX = e.touches[0].x
         this.touchY = e.touches[0].y
         this.touchStartX = e.touches[0].x
         this.touchStartY = e.touches[0].y
       },
-      touchMove(e){
+      touchMove(e) {
         this.touchX = e.touches[0].x
         this.touchY = e.touches[0].y
       },
-      touchEnd(e){
+      touchEnd(e) {
         this.touchEnd = true
       }
     }
@@ -68,8 +68,12 @@
     }
 
     onReady() {
-      let context = wx.createCanvasContext('circle')
-
+      let ctx = wx.createCanvasContext('circle')
+      ctx.arc(100, 75, 50, 0, 2 * Math.PI)
+      ctx.setFillStyle('CadetBlue')
+      ctx.fill()
+      ctx.setShadow(10, 10, 50, 'red')
+      ctx.draw()
     }
   }
 </script>

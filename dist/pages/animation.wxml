@@ -1,0 +1,16 @@
+
+  <view class="container">
+  <view class="page">
+    <view class="dialogue-box">
+        <image class="avatar fl" src="{{ avatar }}" mode="scaleToFill"/>
+        <view class="dialogue fl">
+            <view class="triangle"/>
+            <text class="dialogue-text" selectable="true">有事请讲，无事退朝。</text>
+        </view>
+    </view>
+    <block wx:for="{{animationData}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        <image class="flower" animation="{{ item }}" src="{{ flowers[index].src }}" mode="aspectFit" bindload="imageLoad"/>
+    </block>
+        <image class="flower" animation="{{animationData[0]}}" src="{{ flowers[0].src }}" mode="aspectFit" bindload="imageLoad"/>
+  </view>
+  </view>

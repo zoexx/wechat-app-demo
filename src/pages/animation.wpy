@@ -1,0 +1,151 @@
+<style lang="less">
+.page{
+  width: 750rpx;
+  height: 898rpx;/*81%*/
+  background-color:#eeeeee;
+  overflow: hidden;
+}
+.flower{
+    width:20px;
+    height:20px;
+    position:absolute;
+    top: -30px ;
+    z-index:0;
+}
+.avatar{
+    width:80rpx;
+    height:80rpx;
+    border-radius: 90rpx;
+}
+.dialogue-box{
+    padding:32rpx;
+    position:relative;
+    z-index:2;
+    overflow:hidden;
+}
+.dialogue{
+    background-color:#ffffff;
+    border-radius:4rpx;
+    border:1rpx solid #f2f2f2;
+    padding:16rpx;
+    margin-left:20rpx;
+    position:relative;
+}
+.dialogue-text{
+    position:relative;
+    z-index:2;
+}
+.triangle{
+    width:20rpx;
+    height:20rpx;
+    background-color:#ffffff;
+    border-top:1rpx solid #f2f2f2;
+    border-left:1rpx solid #f2f2f2;
+    position:absolute;
+    top:10rpx;
+    left:-10rpx;
+    transform:rotate(-45deg);
+    z-index:1;
+}
+.mt10{
+    margin-top:10rpx;
+}
+.fl{
+    float:left;
+}
+</style>
+<template>
+  <view class="container">
+  <view class="page">
+    <view class="dialogue-box">
+        <image class="avatar fl" src="{{ avatar }}" mode="scaleToFill"></image>
+        <view class="dialogue fl">
+            <view class="triangle"></view>
+            <text class="dialogue-text" selectable="true">有事请讲，无事退朝。</text>
+        </view>
+    </view>
+    <repeat for="{{animationData}}" key="index" index="index" item="item">
+        <image class="flower" animation="{{ item }}" src="{{ flowers[index].src }}" mode="aspectFit" @load="imageLoad"></image>
+    </repeat>
+        <image class="flower" animation="{{animationData[0]}}" src="{{ flowers[0].src }}" mode="aspectFit" @load="imageLoad"></image>
+  </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Flowers from '../libs/Flowers.js'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'animation',
+      navigationBarBackgroundColor: '#F7F7F7',
+      backgroundColor: '#F7F7F7',
+      navigationBarTextStyle: 'black'
+    }
+
+    components = {
+    }
+
+    data = {
+      avatar: 'http://7xndda.com1.z0.glb.clouddn.com/myMarioBlue.jpg',
+      flowers: Flowers,
+      animationData: []
+    }
+
+    methods = {
+      imageLoad (e) {
+        console.log(e)
+      }
+    }
+
+    createAnimationRadom() {
+      let animation = wx.createAnimation({
+        duration: 1000,
+        timingFunction: 'linear'
+      })
+
+      const visualX = this.sysInfo.windowWidth
+      const visualY = this.sysInfo.windowHeight
+
+      const flowerWidth = 20
+
+      let Y = 0
+      const X = Math.round(Math.random() * (visualX - flowerWidth) + flowerWidth)
+      const stepY = Math.round(Math.random() * (60 - 20) + 20)
+
+      // console.log('step',X,stepY)
+      animation.translateX(X).step()
+      animation.rotate(45).step()
+
+      while (Y < visualY) {
+        let rotateR = Math.round(Math.random() * (15 - 0) + 0) - 7
+        // console.log('while',Y,visualY,rotateR)
+        animation.translateY((Y += stepY)).rotate(rotateR).step()
+      }
+
+      animation.opacity(0).step()
+
+      this.animationData = [ ...this.animationData, animation.export() ]
+    }
+
+    getInfo () {
+      let self = this
+      wx.getSystemInfo({
+        success: data => {
+          self.sysInfo = data
+        }
+      })
+    }
+
+    onReady() {
+      this.getInfo()
+
+      // 控制花瓣数量
+      const COUNT = 5
+      for (var i = 0; i < COUNT; i++) {
+        this.createAnimationRadom()
+      }
+    }
+  }
+</script>
